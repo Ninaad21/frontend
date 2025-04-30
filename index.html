@@ -1,0 +1,224 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stale Fruit Detector</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Arial", sans-serif;
+        }
+
+        /* Background Image with Less Brightness */
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: url('/static/bg.jpg') center/cover no-repeat;
+
+            position: relative;
+        }
+
+        /* Dark Overlay to Reduce Brightness */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        /* Taskbar */
+        .taskbar {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 2;
+        }
+
+        .taskbar a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .taskbar a:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Transparent Glass Effect for Container */
+        .container {
+            background: rgba(27, 26, 26, 0.222);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 350px;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        label {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #ff6b6b;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        label:hover {
+            background: #ff4757;
+        }
+
+        #imagePreview {
+            margin-top: 15px;
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            display: none;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            border: none;
+            background: #1dd1a1;
+            color: white;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #10ac84;
+        }
+
+        .loading {
+            display: none;
+            margin-top: 10px;
+            font-size: 16px;
+            color: #ff9f43;
+        }
+
+        #result {
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: white;
+        }
+
+        .stale {
+            color: red;
+        }
+
+        .fresh {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="taskbar">
+        <a href="#" onclick="goHome()">🏠 Home</a>
+        <a href="#" onclick="viewResults()">📜 Past Results</a> 
+    </div>
+
+    <div class="container">
+        <h2>🍎 Stale Fruit Detector 🍏</h2>
+        <input type="file" id="fileInput" accept="image/*">
+        <label for="fileInput">📸 Choose an Image</label>
+        <br>
+        <img id="imagePreview">
+        <p class="loading">⏳ Detecting...</p>
+        <button onclick="uploadImage()">🔍 Detect</button>
+        <p id="result"></p>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById("fileInput");
+        const imagePreview = document.getElementById("imagePreview");
+        const loadingText = document.querySelector(".loading");
+        const resultText = document.getElementById("result");
+    
+        // Show image preview when user selects a file
+        fileInput.addEventListener("change", () => {
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = "block";
+                    resultText.textContent = ""; // Clear previous result
+                    resultText.className = "";   // Clear stale/fresh color
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    
+        // Fake detection logic
+        function uploadImage() {
+            if (!fileInput.files[0]) {
+                alert("Please select an image first!");
+                return;
+            }
+    
+            loadingText.style.display = "block";
+            resultText.textContent = "";
+    
+            // Simulate detection delay
+            setTimeout(() => {
+                loadingText.style.display = "none";
+    
+                // Simulated result: randomly stale or fresh
+                const isStale = Math.random() > 0.5;
+                resultText.textContent = isStale ? "Stale Fruit Detected!" : "Fruit is Fresh!";
+                resultText.className = isStale ? "stale" : "fresh";
+            }, 2000);
+        }
+    
+        // Navigation button logic
+        function goHome() {
+            alert("Going back to home page!");
+        }
+    
+        function viewResults() {
+            alert("Displaying past results!");
+        }
+    </script>
+    
+
+</body>
+</html>
