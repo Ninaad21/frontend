@@ -1,224 +1,337 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stale Fruit Detector</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Arial", sans-serif;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stale Fruit Detector</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Arial", sans-serif;
+    }
 
-        /* Background Image with Less Brightness */
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background: url('/static/bg.jpg') center/cover no-repeat;
+    body {
+      background: url('/static/bg.jpg') center/cover no-repeat fixed;
+      min-height: 200vh;
+      position: relative;
+    }
 
-            position: relative;
-        }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: -1;
+    }
 
-        /* Dark Overlay to Reduce Brightness */
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-        }
+    /* TOP NAVBAR */
+    .navbar {
+      width: 100%;
+      padding: 15px 20px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 3;
+    }
 
-        /* Taskbar */
-        .taskbar {
-            width: 100%;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 2;
-        }
+    .navbar h1 {
+      display: flex;
+      align-items: center;
+      font-size: 20px;
+    }
 
-        .taskbar a {
-            color: white;
-            text-decoration: none;
-            font-size: 16px;
-            padding: 8px 15px;
-            border-radius: 5px;
-            transition: background 0.3s;
-        }
+    .navbar h1 img {
+      width: 28px;
+      height: 28px;
+      margin-right: 10px;
+    }
 
-        .taskbar a:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
+    .menu-btn {
+      font-size: 24px;
+      cursor: pointer;
+    }
 
-        /* Transparent Glass Effect for Container */
-        .container {
-            background: rgba(27, 26, 26, 0.222);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            width: 350px;
-            position: relative;
-            z-index: 1;
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.5);
-        }
+    /* SLIDING SIDEBAR */
+    .sidebar {
+      height: 100%;
+      width: 250px;
+      position: fixed;
+      top: 0;
+      left: -250px;
+      background-color: #111;
+      padding-top: 60px;
+      transition: 0.4s;
+      z-index: 4;
+    }
 
-        h2 {
-            font-size: 20px;
-            margin-bottom: 10px;
-            color: #fff;
-        }
+    .sidebar a {
+      padding: 15px 20px;
+      text-decoration: none;
+      font-size: 18px;
+      color: #fff;
+      display: block;
+      transition: 0.3s;
+    }
 
-        input[type="file"] {
-            display: none;
-        }
+    .sidebar a:hover {
+      background-color: #575757;
+    }
 
-        label {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #ff6b6b;
-            color: white;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
+    .sidebar .closebtn {
+      position: absolute;
+      top: 0;
+      right: 25px;
+      font-size: 36px;
+      color: white;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
 
-        label:hover {
-            background: #ff4757;
-        }
+    .sidebar .closebtn:hover {
+      color: #ff6b6b;
+    }
 
-        #imagePreview {
-            margin-top: 15px;
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 8px;
-            display: none;
-        }
+    /* MAIN CONTAINER */
+    .container {
+      background: rgba(27, 26, 26, 0.3);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      width: 350px;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.5);
+    }
 
-        button {
-            margin-top: 15px;
-            padding: 10px 20px;
-            border: none;
-            background: #1dd1a1;
-            color: white;
-            font-size: 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
+    h2 {
+      font-size: 20px;
+      margin-bottom: 10px;
+      color: #fff;
+    }
 
-        button:hover {
-            background: #10ac84;
-        }
+    input[type="file"] {
+      display: none;
+    }
 
-        .loading {
-            display: none;
-            margin-top: 10px;
-            font-size: 16px;
-            color: #ff9f43;
-        }
+    label {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #ff6b6b;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
 
-        #result {
-            margin-top: 15px;
-            font-size: 18px;
-            font-weight: bold;
-            text-transform: uppercase;
-            color: white;
-        }
+    label:hover {
+      background: #ff4757;
+    }
 
-        .stale {
-            color: red;
-        }
+    #imagePreview {
+      margin-top: 15px;
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+      display: none;
+    }
 
-        .fresh {
-            color: green;
-        }
-    </style>
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      border: none;
+      background: #1dd1a1;
+      color: white;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #10ac84;
+    }
+
+    .loading {
+      display: none;
+      margin-top: 10px;
+      font-size: 16px;
+      color: #ff9f43;
+    }
+
+    #result {
+      margin-top: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: white;
+    }
+
+    .fresh {
+    color: green;
+    font-weight: bold;
+}
+
+    .stale {
+    color: red;
+    font-weight: bold;
+}
+
+
+    /* POPUP OVERLAY */
+    .popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 30px;
+      border-radius: 10px;
+      font-size: 20px;
+      font-weight: bold;
+      z-index: 100;
+      color: #fff;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .popup.fresh {
+      background-color: #33da78;
+      border: 3px solid #27ae60;
+    }
+
+    .popup.stale {
+      background-color: #e74c3c;
+      border: 3px solid #c0392b;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.8) translate(-50%, -50%); }
+      to { opacity: 1; transform: scale(1) translate(-50%, -50%); }
+    }
+  </style>
 </head>
 <body>
 
-    <div class="taskbar">
-        <a href="#" onclick="goHome()">🏠 Home</a>
-        <a href="#" onclick="viewResults()">📜 Past Results</a> 
-    </div>
+  <!-- Navbar -->
+  <div class="navbar">
+    <span class="menu-btn" onclick="toggleSidebar()">☰</span>
+    <h1><img src="/static/logo.png" alt="logo"> <I>CheckMyFruit</I></h1>
+  </div>
 
-    <div class="container">
-        <h2>🍎 Stale Fruit Detector 🍏</h2>
-        <input type="file" id="fileInput" accept="image/*">
-        <label for="fileInput">📸 Choose an Image</label>
-        <br>
-        <img id="imagePreview">
-        <p class="loading">⏳ Detecting...</p>
-        <button onclick="uploadImage()">🔍 Detect</button>
-        <p id="result"></p>
-    </div>
+  <!-- Sidebar Drawer -->
+  <div id="sidebar" class="sidebar">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeSidebar()">×</a>
+    <a href="#" onclick="viewResults()">📜 Past Results</a>
+    <a href="#" onclick="toggleTheme()">🎨 Theme Toggle</a>
+    <a href="#" onclick="adjustBrightness()">💡 Brightness</a>
+    <a href="#" onclick="logout()">🚪 Logout</a>
+  </div>
 
-    <script>
-        const fileInput = document.getElementById("fileInput");
-        const imagePreview = document.getElementById("imagePreview");
-        const loadingText = document.querySelector(".loading");
-        const resultText = document.getElementById("result");
-    
-        // Show image preview when user selects a file
-        fileInput.addEventListener("change", () => {
-            const file = fileInput.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    imagePreview.src = e.target.result;
-                    imagePreview.style.display = "block";
-                    resultText.textContent = ""; // Clear previous result
-                    resultText.className = "";   // Clear stale/fresh color
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    
-        // Fake detection logic
-        function uploadImage() {
-            if (!fileInput.files[0]) {
-                alert("Please select an image first!");
-                return;
-            }
-    
-            loadingText.style.display = "block";
-            resultText.textContent = "";
-    
-            // Simulate detection delay
-            setTimeout(() => {
-                loadingText.style.display = "none";
-    
-                // Simulated result: randomly stale or fresh
-                const isStale = Math.random() > 0.5;
-                resultText.textContent = isStale ? "Stale Fruit Detected!" : "Fruit is Fresh!";
-                resultText.className = isStale ? "stale" : "fresh";
-            }, 2000);
-        }
-    
-        // Navigation button logic
-        function goHome() {
-            alert("Going back to home page!");
-        }
-    
-        function viewResults() {
-            alert("Displaying past results!");
-        }
-    </script>
-    
+  <!-- Main Container -->
+  <div class="container">
+    <h2>🍎 Stale Fruit Detector 🍏</h2>
+    <input type="file" id="fileInput" accept="image/*">
+    <label for="fileInput">📸 Choose an Image</label>
+    <br>
+    <img id="imagePreview">
+    <p class="loading">⏳ Detecting...</p>
+    <button onclick="uploadImage()">🔍 Detect</button>
+    <p id="result"></p>
+  </div>
 
+  <!-- Popup Message -->
+  <div id="popup" class="popup"></div>
+
+  <script>
+    const fileInput = document.getElementById("fileInput");
+    const imagePreview = document.getElementById("imagePreview");
+    const loadingText = document.querySelector(".loading");
+    const resultText = document.getElementById("result");
+    const popup = document.getElementById("popup");
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      if (sidebar.style.left === "0px") {
+        sidebar.style.left = "-250px"; // Close the sidebar
+      } else {
+        sidebar.style.left = "0px"; // Open the sidebar
+      }
+    }
+
+    function closeSidebar() {
+      document.getElementById("sidebar").style.left = "-250px"; // Close the sidebar
+    }
+
+    fileInput.addEventListener("change", () => {
+      const file = fileInput.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          imagePreview.src = e.target.result;
+          imagePreview.style.display = "block";
+          resultText.textContent = "";
+          resultText.className = "";
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    function uploadImage() {
+      const file = fileInput.files[0];
+      if (!file) {
+        alert("Please select an image first!");
+        return;
+      }
+
+      loadingText.style.display = "block";
+      resultText.textContent = "";
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      fetch('/predict', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())  // Expecting JSON response
+      .then(data => {
+        console.log(data);
+        showPopup(data.label); // Show the result popup
+      })
+      .catch(error => console.error('Error:', error));
+    }
+
+    function showPopup(label) {
+      loadingText.style.display = "none";
+      resultText.style.display = "block";
+      resultText.textContent = `Prediction: ${label}`;
+      resultText.classList = label.toLowerCase();
+
+      // Show popup
+      popup.textContent = `This fruit is ${label}`;
+      popup.classList.add(label.toLowerCase());
+      popup.style.display = "block";
+
+      setTimeout(() => {
+        popup.style.display = "none";
+      }, 3000);
+    }
+  </script>
 </body>
 </html>
